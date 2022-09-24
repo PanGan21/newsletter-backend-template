@@ -1,0 +1,16 @@
+// Generation of sqlx-data.json
+cargo sqlx prepare -- --lib
+
+// Build docker image
+docker build --tag newsletter --file Dockerfile .
+
+// Run docker container
+docker run -p 8000:8000 newsletter
+
+// Run migrations inside docker
+SKIP_DOCKER=true ./scripts/init_db.sh
+
+// Get logs for test, replace testname
+export RUST_LOG="sqlx=error,info"
+export TEST_LOG=enabled
+cargo t test_name | bunyan
